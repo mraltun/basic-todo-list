@@ -12,12 +12,16 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // If the name is empty
     if (!name) {
-      // Display alert
+      showAlert(true, "danger", "Please enter a value");
+      // If there is name AND isEditing is true
     } else if (name && isEditing) {
       // Edit here
+      // It means we are adding a todo in the list, if the above two false
     } else {
       // Show alert
+      // Create a new item with id and title, add to the existing list. Clear the name afterwards.
       const newItem = { id: new Date().getTime().toString(), title: name };
       setList([...list, newItem]);
       setName("");
@@ -28,10 +32,14 @@ const App = () => {
     setName(e.target.value);
   };
 
+  const showAlert = (show = false, type = "", msg = "") => {
+    setAlert({ show, type, msg });
+  };
+
   return (
     <section className='section-center'>
       <form className='todo-form' onSubmit={handleSubmit}>
-        {alert.show && <Alert />}
+        {alert.show && <Alert {...alert} removeAlert={showAlert} />}
         <h3>Basic Todo List</h3>
         <div className='form-control'>
           <input
@@ -46,10 +54,13 @@ const App = () => {
           </button>
         </div>
       </form>
-      <div className='todo-container'>
-        <Todos items={list} />
-        <button className='clear-btn'>Clear Items</button>
-      </div>
+      {/* Hide the todos list until something added to the list */}
+      {list.length > 0 && (
+        <div className='todo-container'>
+          <Todos items={list} />
+          <button className='clear-btn'>Clear Items</button>
+        </div>
+      )}
     </section>
   );
 };
