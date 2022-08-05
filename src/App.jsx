@@ -3,19 +3,26 @@ import Alert from "./components/Alert";
 import Todos from "./components/Todos";
 import "./App.css";
 
+const getLocalStorage = () => {
+  let list = localStorage.getItem("list");
+  if (list) {
+    return (list = JSON.parse(localStorage.getItem("list")));
+  } else {
+    return [];
+  }
+};
+
 const App = () => {
   const [name, setName] = useState("");
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(getLocalStorage());
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // If the name is empty
     if (!name) {
       showAlert(true, "danger", "Please enter a value");
-      // If there is name AND isEditing is true
     } else if (name && isEditing) {
       setList(
         list.map((item) => {
@@ -29,10 +36,9 @@ const App = () => {
       setEditId(null);
       setIsEditing(false);
       showAlert(true, "success", "Value changed!");
-      // It means we are adding a todo in the list, if the above two false
     } else {
       showAlert(true, "success", "Todo added to the list");
-      // Create a new item with id and title, add to the existing list. Clear the name afterwards.
+
       const newItem = { id: new Date().getTime().toString(), title: name };
       setList([...list, newItem]);
       setName("");
@@ -63,6 +69,10 @@ const App = () => {
     setEditId(id);
     setName(specificItem.title);
   };
+
+  useEffect(() => {
+    localStorage.setItem("list", JSON.stringify(list));
+  }, [list]);
 
   return (
     <section className='section-center'>
