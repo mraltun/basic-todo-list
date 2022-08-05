@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import Alert from "./components/Alert";
 import Todos from "./components/Todos";
 import "./App.css";
@@ -18,6 +19,10 @@ const App = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
+
+  useEffect(() => {
+    localStorage.setItem("list", JSON.stringify(list));
+  }, [list]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,7 +44,7 @@ const App = () => {
     } else {
       showAlert(true, "success", "Todo added to the list");
 
-      const newItem = { id: new Date().getTime().toString(), title: name };
+      const newItem = { id: uuidv4(), title: name };
       setList([...list, newItem]);
       setName("");
     }
@@ -70,15 +75,12 @@ const App = () => {
     setName(specificItem.title);
   };
 
-  useEffect(() => {
-    localStorage.setItem("list", JSON.stringify(list));
-  }, [list]);
-
   return (
     <section className='section-center'>
       <form className='todo-form' onSubmit={handleSubmit}>
         {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
         <h3>Basic Todo List</h3>
+
         <div className='form-control'>
           <input
             type='text'
@@ -92,7 +94,7 @@ const App = () => {
           </button>
         </div>
       </form>
-      {/* Hide the todos list until something added to the list */}
+
       {list.length > 0 && (
         <div className='todo-container'>
           <Todos items={list} removeItem={removeItem} editItem={editItem} />
